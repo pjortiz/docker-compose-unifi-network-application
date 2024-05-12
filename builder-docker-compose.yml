@@ -8,7 +8,8 @@ services:
       context: .
       dockerfile_inline: |
         FROM docker.io/mongo:6.0.15-jammy
-        COPY ./init-mongo.js /docker-entrypoint-initdb.d/init-mongo.js
+        RUN mkdir -p /docker-entrypoint-initdb.d
+        ADD https://raw.githubusercontent.com/pjortiz/docker-compose-unifi-network-application/main/mongo-init.js /docker-entrypoint-initdb.d/init-mongo.js
     container_name: unifi-mongo-db
     environment:
       - MONGO_USER=${MONGO_USER:-unifi}                     # Default "unifi"
