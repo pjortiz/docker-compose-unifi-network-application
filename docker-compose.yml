@@ -12,7 +12,7 @@ services:
       - MONGO_DBNAME=${MONGO_DBNAME:-unifi}                   # Default "unifi"
     volumes:
       - mongo-data:/data/db
-      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.sh:ro
+      - init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.sh:ro
     restart: 
       unless-stopped
   unifi-network-application:
