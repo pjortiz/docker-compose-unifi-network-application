@@ -15,7 +15,7 @@ services:
       - type: bind
         source: ./init-mongo.js
         target: /docker-entrypoint-initdb.d/init-mongo.js
-        mode: ro
+        read_only: true
     restart: unless-stopped
   unifi-network-application:
     image: lscr.io/linuxserver/unifi-network-application:latest
