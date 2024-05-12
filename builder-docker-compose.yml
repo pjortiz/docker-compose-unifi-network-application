@@ -1,4 +1,8 @@
 version: "3.7"
+networks:
+  proxy:
+    external: true
+  unifi:
 volumes:
   unifi_mongo_data:
   unifi-config:
@@ -17,13 +21,9 @@ services:
       - MONGO_DBNAME=${MONGO_DBNAME:-unifi}                 # Default "unifi"
     volumes:
       - unifi_mongo_data:/data/db
+    networks:
+      unifi:
     restart: unless-stopped
-    # healthcheck:
-    #   test: echo 'db.runCommand("ping").ok' | mongo mongo:27017/test --quiet
-    #   interval: 10s
-    #   timeout: 10s
-    #   retries: 5
-    #   start_period: 20s
   unifi-network-application:
     image: lscr.io/linuxserver/unifi-network-application:latest
     container_name: unifi-network-application
@@ -55,4 +55,7 @@ services:
       # - 8880:8880 #optional
       - 6789:6789 #optional
       - 5514:5514/udp #optional
+    networks:
+      proxy:
+      unifi:
     restart: unless-stopped
