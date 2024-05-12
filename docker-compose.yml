@@ -14,7 +14,8 @@ services:
       - mongo-data:/data/db
       - type: bind
         source: ./init-mongo.js
-        target: /docker-entrypoint-initdb.d/init-mongo.sh:ro
+        target: /docker-entrypoint-initdb.d/init-mongo.js
+        mode: ro
     restart: unless-stopped
   unifi-network-application:
     image: lscr.io/linuxserver/unifi-network-application:latest
