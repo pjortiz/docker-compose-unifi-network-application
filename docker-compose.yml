@@ -19,14 +19,10 @@ services:
       - MONGO_DBNAME=${MONGO_DBNAME:-unifi}                 # Default "unifi"
     volumes:
       - unifi_mongo_data:/data/db
+    ports:
+      - 27017:27017
     networks:
       unifi:
-    healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
-      interval: 10s
-      timeout: 10s
-      retries: 5
-      start_period: 20s
     restart: unless-stopped
   unifi-network-application:
     image: lscr.io/linuxserver/unifi-network-application:latest
@@ -34,7 +30,6 @@ services:
     depends_on: 
       unifi-mongo-db: 
         condition: service_healthy
-        # condition: service_started
     environment:
       - PUID=1000
       - PGID=1000
@@ -44,10 +39,10 @@ services:
       - MONGO_DBNAME=${MONGO_DBNAME:-unifi}                 # Default "unifi"
       - MONGO_HOST=unifi-mongo-db
       - MONGO_PORT=27017
-      # - MEM_LIMIT=1024 #optional
-      # - MEM_STARTUP=1024 #optional
-      # - MONGO_TLS= #optional
-      # - MONGO_AUTHSOURCE= #optional
+      # - MEM_LIMIT=1024      #optional
+      # - MEM_STARTUP=1024    #optional
+      # - MONGO_TLS=          #optional
+      # - MONGO_AUTHSOURCE=   #optional
     volumes:
       - unifi-config:/config
     ports:
@@ -55,11 +50,11 @@ services:
       - 3478:3478/udp
       - 10001:10001/udp
       - 8080:8080
-      - 1900:1900/udp #optional
-      # - 8843:8843 #optional
-      # - 8880:8880 #optional
-      - 6789:6789 #optional
-      - 5514:5514/udp #optional
+      - 1900:1900/udp   #optional
+      # - 8843:8843     #optional
+      # - 8880:8880     #optional
+      - 6789:6789       #optional
+      - 5514:5514/udp   #optional
     networks:
       app-network:
       unifi:
