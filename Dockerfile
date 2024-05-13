@@ -1,5 +1,5 @@
 ARG MONGO_VERSION
-FROM docker.io/mongo:${MONGO_VERSION?Missing Mongo version}
+FROM docker.io/mongo:${MONGO_VERSION}
 COPY --chmod=755 ./scripts /scripts
 RUN mkdir -p /docker-entrypoint-initdb.d
 
