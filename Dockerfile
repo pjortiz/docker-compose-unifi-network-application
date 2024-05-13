@@ -8,7 +8,7 @@ COPY --chmod=755 ./scripts /scripts
 # Make the directory incase it doesn't exist
 RUN mkdir -p /docker-entrypoint-initdb.d
 
-# Dynamicaly chose script(s) based one provided
+# Dynamicaly choose script(s) based on provided MONGO_VERSION
 RUN if [ -d "/scripts/${MONGO_VERSION}" ] && [ "$(ls -A /scripts/${MONGO_VERSION})" ]; then \
         cp -r /scripts/${MONGO_VERSION}/* /docker-entrypoint-initdb.d/; \
     elif [ "${MONGO_VERSION%%.*}" -ge 6 ] && [ -d "/scripts/6+" ]; then \
