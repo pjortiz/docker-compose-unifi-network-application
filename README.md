@@ -22,9 +22,10 @@ While I myself am a person in the tech industry and deal with similar systems an
 ## Quick Start
 
 ```Shell
-echo MONGO_PASS=changeme > .env && curl -Lf -o docker-compose.yml https://raw.githubusercontent.com/pjortiz/docker-compose-unifi-network-application/main/docker-compose.yml && docker compose --env-file .env up --detach
+echo MONGO_PASS=changeme > .env && curl -Lf -o docker-compose.yml https://raw.githubusercontent.com/pjortiz/docker-compose-unifi-network-application/main/docker-compose.yml && docker compose -p unifi-network-application --env-file .env up --detach
 ```
 Note: this `docker-compose.yml` uses Mongo version `6.0.15` by default.
 
 ## Adding your own scripts
+
 If you need a custom script based on your needs. After forking/clone this repo create a directory under `scripts` with your specific Mongo version tag, then add your script(s) in that new directory. Then update the `build.context` in `docker-compose.yml` to either `.` for local execution or the url of your forked repo.
