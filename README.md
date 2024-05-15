@@ -1,21 +1,19 @@
-# docker-compose-unifi-network-application
+# docker-compose-unifi-network-application <!-- omit in toc -->
 
-## Table of Contents
+## Table of Contents <!-- omit in toc -->
 
-- [docker-compose-unifi-network-application](#docker-compose-unifi-network-application)
-  - [Table of Contents](#table-of-contents)
-  - [Quick reference](#quick-reference)
-  - [Why?](#why)
-  - [Requirements](#requirements)
-  - [Quick Start](#quick-start)
-  - [Step by step](#step-by-step)
-    - [Create a new project directory](#create-a-new-project-directory)
-    - [Create the .env file](#create-the-env-file)
-    - [Download Docker Compose Configuration File](#download-docker-compose-configuration-file)
-    - [Launch Docker Containers](#launch-docker-containers)
-    - [Open Web App](#open-web-app)
-  - [Adding your own scripts](#adding-your-own-scripts)
-  - [Remove/Uninstall](#removeuninstall)
+- [Quick reference](#quick-reference)
+- [Why?](#why)
+- [Requirements](#requirements)
+- [Quick Start](#quick-start)
+- [Step by step](#step-by-step)
+  - [Create a new project directory](#create-a-new-project-directory)
+  - [Create the .env file](#create-the-env-file)
+  - [Download Docker Compose Configuration File](#download-docker-compose-configuration-file)
+  - [Launch Docker Containers](#launch-docker-containers)
+  - [Open Web App](#open-web-app)
+- [Adding your own scripts](#adding-your-own-scripts)
+- [Remove/Uninstall](#removeuninstall)
 
 _______________________________________
 
@@ -117,3 +115,6 @@ docker compose -p unifi-network-application rm --stop
 ```
 
 Add option `--volumes` after `rm` to remove volumes as well.
+
+
+[def]: #docker-compose-unifi-network-application
