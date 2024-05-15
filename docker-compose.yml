@@ -11,7 +11,7 @@ services:
     build:
       context: https://github.com/pjortiz/docker-compose-unifi-network-application.git
       args:
-        - MONGO_VERSION=6.0.15                              # Required, specify whatever Mongo version tag you need. DO NOT set 'latest' tag
+        - MONGO_VERSION=${MONGO_VERSION:-6.0.15}            # Required, Default "6.0.15", specify whatever Mongo version tag you need. DO NOT set 'latest' tag
     container_name: unifi-mongo-db
     environment:
       - MONGO_USER=${MONGO_USER:-unifi}                     # Default "unifi"
