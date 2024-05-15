@@ -1,6 +1,6 @@
 version: "3.7"
 networks:
-  # proxy-network: # optional, Use this network or our own if you intend to configure the unifi-network-application container through a revers proxy, otherwise not needed.
+  # proxy-network: # optional, Use this network or your own if you intend to configure the unifi-network-application container through a revers proxy, otherwise not needed.
     # external: true
   unifi:
 volumes: # You can change the volumes' device path if you want, otherwise no need to change, default Docker volume folder location will be used 
