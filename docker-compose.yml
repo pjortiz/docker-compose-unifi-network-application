@@ -8,10 +8,7 @@ volumes: # You can change the volumes' device path if you want, otherwise no nee
   unifi-config:
 services:
   unifi-mongo-db:
-    build:
-      context: https://github.com/pjortiz/docker-compose-unifi-network-application.git
-      args:
-        - MONGO_VERSION=${MONGO_VERSION:-6.0.15}            # Required, Default "6.0.15", specify whatever Mongo version tag you need. DO NOT set 'latest' tag
+    image: portiz93/unifi-mongo:${MONGO_VERSION:-6.0.15}    # Required MONGO_VERSION, Default "6.0.15", specify whatever Mongo version tag you need. DO NOT set 'latest' tag
     container_name: unifi-mongo-db
     environment:
       - MONGO_USER=${MONGO_USER:-unifi}                     # Default "unifi"
@@ -19,11 +16,12 @@ services:
       - MONGO_DBNAME=${MONGO_DBNAME:-unifi}                 # Default "unifi"
     volumes:
       - unifi_mongo_data:/data/db
-    ports:
-      - 27017:27017                                         # optional, Default "27017"
+    # ports:
+    #   - 27017:27017                                       # optional, Default "27017", only port if needed outside of unifi app
     networks:
       unifi:
     restart: unless-stopped
+
   unifi-network-application:
     image: lscr.io/linuxserver/unifi-network-application:latest
     container_name: unifi-network-application

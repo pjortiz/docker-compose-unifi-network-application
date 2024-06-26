@@ -1,5 +1,6 @@
 # VSCode
 *.code-workspace
+.vscode
 
 # Environments
 .env
