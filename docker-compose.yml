@@ -11,6 +11,8 @@ services:
     image: portiz93/unifi-mongo:${MONGO_VERSION:-6.0.15}    # Required MONGO_VERSION, Default "6.0.15", specify whatever Mongo version tag you need. DO NOT set 'latest' tag
     container_name: unifi-mongo-db
     environment:
+      # - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME:-root}                    # Required only if using mongodb version < 6.0, otherwise do not set (See official Mongo image)
+      # - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD:?Root Password Required}  # Required only if using mongodb version < 6.0, otherwise do not set  (See official Mongo image)
       - MONGO_USER=${MONGO_USER:-unifi}                     # Default "unifi"
       - MONGO_PASS=${MONGO_PASS:?Mongo Password Required}   # Required
       - MONGO_DBNAME=${MONGO_DBNAME:-unifi}                 # Default "unifi"
