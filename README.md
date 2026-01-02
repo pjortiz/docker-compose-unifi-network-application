@@ -5,6 +5,7 @@
 - [Quick reference](#quick-reference)
 - [Why?](#why)
 - [Requirements](#requirements)
+- [Docker Compose File](#docker-compose-file)
 - [Quick Start](#quick-start)
 - [Step by step](#step-by-step)
   - [Create a new project directory](#create-a-new-project-directory)
@@ -38,6 +39,74 @@ _______________________________________
 
 _______________________________________
 
+## Docker Compose File
+
+```yaml:docker-compose.yml
+version: "3.7"
+networks:
+  # proxy-network: # optional, Use this network or your own if you intend to configure the unifi-network-application container through a revers proxy, otherwise not needed.
+    # external: true
+  unifi:
+volumes: # You can change the volumes' device path if you want, otherwise no need to change, default Docker volume folder location will be used 
+  unifi_mongo_data:
+  unifi-config:
+services:
+  unifi-mongo:
+    image: portiz93/unifi-mongo:${MONGO_VERSION:-8.2.3}    # Required MONGO_VERSION, Default "8.2.3", specify whatever Mongo version tag you need. DO NOT set 'latest' tag
+    container_name: unifi-mongo
+    environment:
+      # - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME:-root}                    # Required only if using mongodb version < 6.0, otherwise do not set (See official Mongo image)
+      # - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD:?Root Password Required}  # Required only if using mongodb version < 6.0, otherwise do not set  (See official Mongo image)
+      - MONGO_USER=${MONGO_USER:-unifi}                     # Default "unifi"
+      - MONGO_PASS=${MONGO_PASS:?Mongo Password Required}   # Required
+      - MONGO_DBNAME=${MONGO_DBNAME:-unifi}                 # Default "unifi"
+    volumes:
+      - unifi_mongo_data:/data/db
+    # ports:
+    #   - 27017:27017                                       # optional, Default "27017", only port if needed outside of unifi app
+    networks:
+      unifi:
+    restart: unless-stopped
+
+  unifi-network-application:
+    image: lscr.io/linuxserver/unifi-network-application:latest
+    container_name: unifi-network-application
+    depends_on: 
+      unifi-mongo: 
+        condition: service_healthy
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+      - MONGO_USER=${MONGO_USER:-unifi}                     # Required, Default "unifi"
+      - MONGO_PASS=${MONGO_PASS:?Mongo Password Required}   # Required, Note some special charactor could cause failure to connect to MondoDB
+      - MONGO_DBNAME=${MONGO_DBNAME:-unifi}                 # Required, Default "unifi"
+      - MONGO_HOST=unifi-mongo                              # Required, must match the mongo container name
+      - MONGO_PORT=27017                                    # Required, Must be that same as the mongo container defined port
+      # - MEM_LIMIT=1024                                    # optional
+      # - MEM_STARTUP=1024                                  # optional
+      # - MONGO_TLS=                                        # optional
+      # - MONGO_AUTHSOURCE=                                 # optional
+    volumes:
+      - unifi-config:/config
+    ports:
+      - 8443:8443
+      - 3478:3478/udp
+      - 10001:10001/udp
+      - 8080:8080
+      - 1900:1900/udp                                       # optional
+      # - 8843:8843                                         # optional
+      # - 8880:8880                                         # optional
+      - 6789:6789                                           # optional
+      - 5514:5514/udp                                       # optional
+    networks:
+      # proxy-network: # optional, Use this network or our own if you intend to configure the unifi-network-application container through a revers proxy, otherwise not needed.
+      unifi:
+    restart: unless-stopped
+```
+
+_______________________________________
+
 ## Quick Start
 
 Copy the below command into any CLI. [^2]
@@ -47,10 +116,10 @@ Make sure to change `MONGO_PASS` and set `MONGO_VERSION` as needed.
 [^2]: For the `printf` , `curl` and `rm` commands, Windows users may need to have GitBash installed or similar that provide these CLI commands.
 
 ```Shell
-printf "MONGO_VERSION=6.0.15\nMONGO_PASS=changeme" > .env && curl -Lf -o docker-compose.yml https://raw.githubusercontent.com/pjortiz/docker-compose-unifi-network-application/main/docker-compose.yml && docker compose -p unifi-network-application --env-file .env up --detach
+printf "MONGO_VERSION=8.2.3\nMONGO_PASS=changeme" > .env && curl -Lf -o docker-compose.yml https://raw.githubusercontent.com/pjortiz/docker-compose-unifi-network-application/main/docker-compose.yml && docker compose -p unifi-network-application --env-file .env up --detach
 ```
 
-Note: this `docker-compose.yml` uses Mongo version `6.0.15` by default, so specifying `MONGO_VERSION` above with the same is technically redundant.
+Note: this `docker-compose.yml` uses Mongo version `8.2.3` by default, so specifying `MONGO_VERSION` above with the same is technically redundant.
 
 Clean up left over files if needed with below command.
 
@@ -73,7 +142,7 @@ Download the `.env.template` file and rename it to `.env` or create an empty fil
 Add/Change the following:
 
 ```bash
-MONGO_VERSION=6.0.15    # Optional, if not provided uses default
+MONGO_VERSION=8.2.3    # Optional, if not provided uses default
 MONGO_PASS=changeme     # Required
 ```
 

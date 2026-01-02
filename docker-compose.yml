@@ -8,7 +8,7 @@ volumes: # You can change the volumes' device path if you want, otherwise no nee
   unifi-config:
 services:
   unifi-mongo:
-    image: portiz93/unifi-mongo:${MONGO_VERSION:-6.0.15}    # Required MONGO_VERSION, Default "6.0.15", specify whatever Mongo version tag you need. DO NOT set 'latest' tag
+    image: portiz93/unifi-mongo:${MONGO_VERSION:-8.2.3}    # Required MONGO_VERSION, Default "8.2.3", specify whatever Mongo version tag you need. DO NOT set 'latest' tag
     container_name: unifi-mongo
     environment:
       # - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME:-root}                    # Required only if using mongodb version < 6.0, otherwise do not set (See official Mongo image)
