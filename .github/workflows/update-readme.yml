@@ -1,0 +1,46 @@
+name: Update README with docker-compose.yml
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * *' # This runs the action every 24 hours
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/template/docker-compose.template.yml'
+      - '.github/workflows/template/README.template.md'
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate README from template
+        run: |
+            export LATEST_VERSION=$(curl -fsSL https://raw.githubusercontent.com/pjortiz/docker-unifi-mongo/main/README.md | grep 'image: portiz93/unifi-mongo:' | sed -E 's/.*image: portiz93\/unifi-mongo:\$\{MONGO_VERSION:-([^}]*)\}.*/\1/')
+            envsubst < .github/workflows/template/docker-compose.template.yml > docker-compose.yml
+            
+            export DOCKER_COMPOSE=$(cat docker-compose.yml)
+            envsubst < .github/workflows/template/README.template.md > README.md
+
+      - name: Check if there are changes
+        id: verify-changed-files
+        run: |
+          if git diff --quiet; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit and push changes
+        if: steps.verify-changed-files.outputs.changed == 'true'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add README.md docker-compose.yml
+          git commit -m "docs: update README with docker-compose.yml contents"
+          git push
