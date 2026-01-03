@@ -42,14 +42,41 @@ _______________________________________
 ## Docker Compose File
 
 ```yaml:docker-compose.yml
-version: "3.7"
 networks:
-  # proxy-network: # optional, Use this network or your own if you intend to configure the unifi-network-application container through a revers proxy, otherwise not needed.
-    # external: true
-  unifi:
-volumes: # You can change the volumes' device path if you want, otherwise no need to change, default Docker volume folder location will be used 
+  unifi-internal:
+  # ---------------------------------------------------------------------------
+  # Optional, Use this network or your own if you intend to configure the 
+  # unifi-network-application container through a revers proxy, otherwise not needed.
+  # ---------------------------------------------------------------------------
+  # proxy-network: 
+  #   external: true
+
+  # ---------------------------------------------------------------------------
+  # If your Docker host is on a different subnet than your unifi devices, 
+  # you can use macvlan network to assign a static IP to the unifi-network-application 
+  # container so that it can communicate with your unifi devices. Otherwise, you can
+  # you may need to use host network mode for unifi-network-application container.
+  # Note, make sure to comment out port mappings 3478, 10001, 8080, and 1900 if using 
+  # macvlan network with and you want the Unifi UI to be accessible from a reverse proxy 
+  # otherwise you have to remove all port mapping as with host network mode.
+  # ---------------------------------------------------------------------------
+  # unifi-external: 
+  #   driver: macvlan
+  #   driver_opts:
+  #     parent: eth0.1
+  #   ipam:
+  #     config:
+  #       - subnet: 192.168.1.0/24
+  #         gateway: 192.168.1.1
+
+# -----------------------------------------------------------------------------
+# You can change the volumes' device path if you want, otherwise no need to change, 
+# default Docker volume folder location will be used.
+# -----------------------------------------------------------------------------
+volumes: 
   unifi_mongo_data:
   unifi-config:
+  
 services:
   unifi-mongo:
     image: portiz93/unifi-mongo:${MONGO_VERSION:-8.2.3}    # Required MONGO_VERSION, Default "8.2.3", specify whatever Mongo version tag you need. DO NOT set 'latest' tag
@@ -63,14 +90,17 @@ services:
     volumes:
       - unifi_mongo_data:/data/db
     # ports:
-    #   - 27017:27017                                       # optional, Default "27017", only port if needed outside of unifi app
+    #   - 27017:27017  # optional, Default "27017", only port if needed outside of unifi app
     networks:
-      unifi:
+      - unifi-internal
     restart: unless-stopped
+    labels: # IMPORTANT, if you have watchtower, disable auto update for this container
+      com.centurylinklabs.watchtower.enable: false   
 
   unifi-network-application:
-    image: lscr.io/linuxserver/unifi-network-application:latest
+    image: linuxserver/unifi-network-application:latest
     container_name: unifi-network-application
+    hostname: unifi-controller
     depends_on: 
       unifi-mongo: 
         condition: service_healthy
@@ -90,18 +120,21 @@ services:
     volumes:
       - unifi-config:/config
     ports:
-      - 8443:8443
-      - 3478:3478/udp
-      - 10001:10001/udp
-      - 8080:8080
-      - 1900:1900/udp                                       # optional
-      # - 8843:8843                                         # optional
-      # - 8880:8880                                         # optional
-      - 6789:6789                                           # optional
-      - 5514:5514/udp                                       # optional
+      - 8443:8443          # Unifi web admin port
+      # - 3478:3478/udp      # Unifi STUN port, required for remote access. Unless your controller will never be accessed remotely, you can comment this port.
+      - 10001:10001/udp    # Required for AP discovery
+      - 8080:8080          # Required for device communication
+      - 1900:1900/udp      # Required for Make controller discoverable on L2 network option
+      # - 8843:8843          # optional Unifi guest portal HTTPS redirect port
+      # - 8880:8880          # optional Unifi guest portal HTTP redirect port
+      # - 6789:6789          # optional For mobile throughput test
+      # - 5514:5514/udp      # optional Remote syslog port
     networks:
-      # proxy-network: # optional, Use this network or our own if you intend to configure the unifi-network-application container through a revers proxy, otherwise not needed.
-      unifi:
+      proxy-network: # optional, Use this network or our own if you intend to configure the unifi-network-application container through a revers proxy, otherwise not needed.
+      unifi-internal:
+      # unifi-external:
+      #   ipv4_address: 192.168.1.11       # Set a static IP address on the macvlan network, must be in the subnet range of the macvlan network 
+      #   mac_address: "02:42:c0:a8:01:64" # optional, set a static MAC address if needed
     restart: unless-stopped
 ```
 
