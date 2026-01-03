@@ -63,11 +63,11 @@ networks:
   unifi-external: 
     driver: macvlan
     driver_opts:
-      parent: eth0               # replace with your hosts interface 
+      parent: ${MAC_VLAN_PARENT:-eth0}               # replace with your hosts interface 
     ipam:
       config:
-        - subnet: 192.168.1.0/24 # replace with your network subnet
-          gateway: 192.168.1.1   # replace with your network gateway
+        - subnet: ${MAC_VLAN_SUBNET:-192.168.1.0/24} # replace with your network subnet
+          gateway: ${MAC_VLAN_GATEWAY:-192.168.1.1}  # replace with your network gateway
 
 volumes: 
   unifi_mongo_data:
@@ -135,9 +135,9 @@ services:
     networks:
       # proxy-network:       # optional
       unifi-internal:
-      # unifi-external:
-      #   ipv4_address: 192.168.1.11       # Set a static IP address, must be in the subnet of the macvlan network 
-      #   mac_address: "02:42:c0:a8:01:64" # optional, set a static MAC address if needed
+      unifi-external:
+        ipv4_address: ${UNIFI_STATIC_IP:-192.168.1.11}         # Set a static IP address, must be in the subnet of the macvlan network 
+        mac_address: ${UNIFI_MAC_ADDRESS:-"02:42:c0:a8:01:64"} # optional, set a static MAC address if needed
     restart: unless-stopped
 ```
 
@@ -152,16 +152,20 @@ Make sure to change `MONGO_PASS` and set `MONGO_VERSION` as needed.
 [^2]: For the `printf` , `curl` and `rm` commands, Windows users may need to have GitBash installed or similar that provide these CLI commands.
 
 ```Shell
-printf "MONGO_VERSION=8.2.3\nMONGO_PASS=changeme" > .env && curl -Lf -o docker-compose.yml https://raw.githubusercontent.com/pjortiz/docker-compose-unifi-network-application/main/docker-compose.yml && docker compose -p unifi-network-application --env-file .env up --detach
+cat > .env <<EOF
+MONGO_PASS=changeme
+MONGO_VERSION=8.2.3
+MAC_VLAN_PARENT=
+MAC_VLAN_SUBNET=
+MAC_VLAN_GATEWAY=
+UNIFI_STATIC_IP=
+UNIFI_MAC_ADDRESS=
+EOF
+curl -Lf -o docker-compose.yml https://raw.githubusercontent.com/pjortiz/docker-compose-unifi-network-application/main/docker-compose.yml
+docker compose -p unifi-network-application --env-file .env up --detach
 ```
 
 Note: this `docker-compose.yml` uses Mongo version `8.2.3` by default, so specifying `MONGO_VERSION` above with the same is technically redundant.
-
-Clean up left over files if needed with below command.
-
-```bash
-rm -f .env docker-compose.yml
-```
 
 _______________________________________
 
@@ -177,12 +181,17 @@ Download the `.env.template` file and rename it to `.env` or create an empty fil
 
 Add/Change the following:
 
-```bash
-MONGO_VERSION=8.2.3    # Optional, if not provided uses default
-MONGO_PASS=changeme     # Required
+```bash:.env
+MONGO_PASS=changeme             # Required
+MONGO_VERSION=8.2.3
+MAC_VLAN_PARENT=
+MAC_VLAN_SUBNET=
+MAC_VLAN_GATEWAY=
+UNIFI_STATIC_IP=
+UNIFI_MAC_ADDRESS=
 ```
 
-Change the `MONGO_PASS` to what every you want. And set the `MONGO_VERSION` to meet your needs or leave default.
+Change the `MONGO_PASS` to what every you want. And set the `MONGO_VERSION` to meet your needs or leave default. The rest you can set to meet your needs, otherwise should be fine to leave as is, as long as your subnet matchs above and the default static IP is not in use.
 
 ### Download Docker Compose Configuration File
 

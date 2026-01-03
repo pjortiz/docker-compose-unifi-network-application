@@ -19,11 +19,11 @@ networks:
   unifi-external: 
     driver: macvlan
     driver_opts:
-      parent: eth0               # replace with your hosts interface 
+      parent: ${MAC_VLAN_PARENT:-eth0}               # replace with your hosts interface 
     ipam:
       config:
-        - subnet: 192.168.1.0/24 # replace with your network subnet
-          gateway: 192.168.1.1   # replace with your network gateway
+        - subnet: ${MAC_VLAN_SUBNET:-192.168.1.0/24} # replace with your network subnet
+          gateway: ${MAC_VLAN_GATEWAY:-192.168.1.1}  # replace with your network gateway
 
 volumes: 
   unifi_mongo_data:
@@ -91,7 +91,7 @@ services:
     networks:
       # proxy-network:       # optional
       unifi-internal:
-      # unifi-external:
-      #   ipv4_address: 192.168.1.11       # Set a static IP address, must be in the subnet of the macvlan network 
-      #   mac_address: "02:42:c0:a8:01:64" # optional, set a static MAC address if needed
+      unifi-external:
+        ipv4_address: ${UNIFI_STATIC_IP:-192.168.1.11}         # Set a static IP address, must be in the subnet of the macvlan network 
+        mac_address: ${UNIFI_MAC_ADDRESS:-"02:42:c0:a8:01:64"} # optional, set a static MAC address if needed
     restart: unless-stopped
