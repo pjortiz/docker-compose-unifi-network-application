@@ -56,16 +56,20 @@ Make sure to change `MONGO_PASS` and set `MONGO_VERSION` as needed.
 [^2]: For the `printf` , `curl` and `rm` commands, Windows users may need to have GitBash installed or similar that provide these CLI commands.
 
 ```Shell
-printf "MONGO_VERSION=${LATEST_VERSION}\nMONGO_PASS=changeme" > .env && curl -Lf -o docker-compose.yml https://raw.githubusercontent.com/pjortiz/docker-compose-unifi-network-application/main/docker-compose.yml && docker compose -p unifi-network-application --env-file .env up --detach
+cat > .env <<EOF
+MONGO_PASS=changeme
+MONGO_VERSION=${LATEST_VERSION}
+MAC_VLAN_PARENT=
+MAC_VLAN_SUBNET=
+MAC_VLAN_GATEWAY=
+UNIFI_STATIC_IP=
+UNIFI_MAC_ADDRESS=
+EOF
+curl -Lf -o docker-compose.yml https://raw.githubusercontent.com/pjortiz/docker-compose-unifi-network-application/main/docker-compose.yml
+docker compose -p unifi-network-application --env-file .env up --detach
 ```
 
 Note: this `docker-compose.yml` uses Mongo version `${LATEST_VERSION}` by default, so specifying `MONGO_VERSION` above with the same is technically redundant.
-
-Clean up left over files if needed with below command.
-
-```bash
-rm -f .env docker-compose.yml
-```
 
 _______________________________________
 
@@ -81,12 +85,17 @@ Download the `.env.template` file and rename it to `.env` or create an empty fil
 
 Add/Change the following:
 
-```bash
-MONGO_VERSION=${LATEST_VERSION}    # Optional, if not provided uses default
-MONGO_PASS=changeme     # Required
+```bash:.env
+MONGO_PASS=changeme             # Required
+MONGO_VERSION=${LATEST_VERSION}
+MAC_VLAN_PARENT=
+MAC_VLAN_SUBNET=
+MAC_VLAN_GATEWAY=
+UNIFI_STATIC_IP=
+UNIFI_MAC_ADDRESS=
 ```
 
-Change the `MONGO_PASS` to what every you want. And set the `MONGO_VERSION` to meet your needs or leave default.
+Change the `MONGO_PASS` to what every you want. And set the `MONGO_VERSION` to meet your needs or leave default. The rest you can set to meet your needs, otherwise should be fine to leave as is, as long as your subnet matchs above and the default static IP is not in use.
 
 ### Download Docker Compose Configuration File
 
