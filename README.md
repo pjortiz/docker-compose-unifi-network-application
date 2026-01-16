@@ -80,7 +80,7 @@ services:
     #            updates that may break the unifi-network-application container.
     #            If you have watchtower, disable auto update for this container.
     # ---------------------------------------------------------------------------
-    image: portiz93/unifi-mongo:${MONGO_VERSION:-8.2.3}    # Required MONGO_VERSION
+    image: portiz93/unifi-mongo:${MONGO_VERSION:-}    # Required MONGO_VERSION
     container_name: unifi-mongo
     environment:
       - MONGO_USER=${MONGO_USER:-unifi}                     # Default "unifi"
@@ -154,7 +154,7 @@ Make sure to change `MONGO_PASS` and set `MONGO_VERSION` as needed.
 ```Shell
 cat > .env <<EOF
 MONGO_PASS=changeme
-MONGO_VERSION=8.2.3
+MONGO_VERSION=
 MAC_VLAN_PARENT=
 MAC_VLAN_SUBNET=
 MAC_VLAN_GATEWAY=
@@ -165,7 +165,7 @@ curl -Lf -o docker-compose.yml https://raw.githubusercontent.com/pjortiz/docker-
 docker compose -p unifi-network-application --env-file .env up --detach
 ```
 
-Note: this `docker-compose.yml` uses Mongo version `8.2.3` by default, so specifying `MONGO_VERSION` above with the same is technically redundant.
+Note: this `docker-compose.yml` uses Mongo version `` by default, so specifying `MONGO_VERSION` above with the same is technically redundant.
 
 _______________________________________
 
@@ -183,7 +183,7 @@ Add/Change the following:
 
 ```bash:.env
 MONGO_PASS=changeme             # Required
-MONGO_VERSION=8.2.3
+MONGO_VERSION=
 MAC_VLAN_PARENT=
 MAC_VLAN_SUBNET=
 MAC_VLAN_GATEWAY=
